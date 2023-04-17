@@ -13,6 +13,54 @@ const { NotImplementedError } = require('../extensions/index.js');
  * transform([1, 2, 3, '--discard-prev', 4, 5]) => [1, 2, 4, 5]
  * 
  */
+// function transform(arr) {
+//   if (!Array.isArray(arr)) {
+//     throw new Error("'arr' parameter must be an instance of the Array!");
+//   }
+
+//   const controlSequences = {
+//     '--discard-next': (result, i) => {
+//       if (i < arr.length - 1 && arr[i + 1] && arr[i + 1].indexOf('--') !== 0) {
+//         i++;
+//         if (arr[i + 1] && controlSequences[arr[i + 1]]) {
+//           i++;
+//         }
+//       }
+//       return result;
+//     },
+//     '--discard-prev': (result, i) => {
+//       if (i > 0 && arr[i - 2] !== '--discard-next') {
+//         result.pop();
+//       }
+//       return result;
+//     },
+//     '--double-next': (result, i) => {
+//       if (i < arr.length - 1 && arr[i + 1] && arr[i + 1].indexOf('--') !== 0) {
+//         result.push(arr[i + 1]);
+//       }
+//       return result;
+//     },
+//     '--double-prev': (result, i) => {
+//       if (i > 0 && arr[i - 2] !== '--discard-next' && result[result.length - 1] !== undefined) {
+//         result.push(arr[i - 1]);
+//       }
+//       return result;
+//     },
+//   };
+
+//   let result = [];
+
+//   for (let i = 0; i < arr.length; i++) {
+//     if (controlSequences[arr[i]]) {
+//       result = controlSequences[arr[i]](result, i);
+//     } else {
+//       result.push(arr[i]);
+//     }
+//   }
+
+//   return result;
+// }
+
 function transform(arr) {
   if (!Array.isArray(arr)) {
     throw new Error("'arr' parameter must be an instance of the Array!");
@@ -20,8 +68,11 @@ function transform(arr) {
 
   const controlSequences = {
     '--discard-next': (result, i) => {
-      if (i < arr.length - 1) {
+      if (i < arr.length - 1 && typeof arr[i + 1] === 'string' && arr[i + 1].indexOf('--') !== 0) {
         i++;
+        if (arr[i + 1] && controlSequences[arr[i + 1]]) {
+          i++;
+        }
       }
       return result;
     },
@@ -31,15 +82,14 @@ function transform(arr) {
       }
       return result;
     },
-    '--discard-next': (result, i) => {
-      i++;
-      if (arr[i] && controlSequences[arr[i]]) {
-        i++;
+    '--double-next': (result, i) => {
+      if (i < arr.length - 1 && typeof arr[i + 1] === 'string' && arr[i + 1].indexOf('--') !== 0) {
+        result.push(arr[i + 1]);
       }
       return result;
     },
     '--double-prev': (result, i) => {
-      if (i > 0 && arr[i - 2] !== '--discard-next') {
+      if (i > 0 && arr[i - 2] !== '--discard-next' && result[result.length - 1] !== undefined) {
         result.push(arr[i - 1]);
       }
       return result;
