@@ -2,50 +2,42 @@ const { NotImplementedError } = require('../extensions/index.js');
 
 /**
  * Extract season from given date and expose the enemy scout!
- * 
+ *
  * @param {Date | FakeDate} date real or fake date
  * @returns {String} time of the year
- * 
+ *
  * @example
- * 
+ *
  * getSeason(new Date(2020, 02, 31)) => 'spring'
- * 
+ *
  */
-// function getSeason(date) {
-//   let month = date.getMonth();
-
-//   // spring, summer, autumn (fall), winter
-//   if (month => 0 && month <= 1 && month === 11) {
-//     return 'winter';
-//   } else if (month >= 2 && month <= 4) {
-//     return 'spring';
-//   } else if (month >= 5 && month <= 7) {
-//     return 'summer';
-//   } else if (month >= 8 && month <= 10) {
-//     return 'autumn';
-//   }
-// }
 
 function getSeason(date) {
   if (!date) {
     return 'Unable to determine the time of year!';
   }
-  if (!(date instanceof Date && !isNaN(date))) {
-    return 'Invalid date!'
+  if (typeof date !== 'object' || !(date instanceof Date) || typeof date.getMonth !== 'function') {
+    throw new Error('Invalid date!');
   }
+ 
+  // if (Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date) || typeof date.getMonth !== 'function') {
+  //   throw new Error('Invalid date!');
+  // }
   const month = date.getMonth();
-
-  if (month >= 2 && month <= 4) {
-    return 'spring';
-  } else if (month >= 5 && month <= 7) {
-    return 'summer';
-  } else if (month >= 8 && month <= 10) {
-    return 'autumn';
-  } else {
+  if (typeof month !== "number") {
+    throw new Error('Invalid date!');
+  }
+  if (month < 2 || month === 11) {
     return 'winter';
+  } else if (month < 5) {
+    return 'spring';
+  } else if (month < 8) {
+    return 'summer';
+  } else {
+    return 'autumn';
   }
 }
 
 module.exports = {
-  getSeason
+  getSeason,
 };
